@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    'produto',
 
 
 
@@ -163,7 +163,7 @@ SESSION_SAVE_EVERY_REQUEST = False
 # SESSION_ENGINE = "django.contrib.sessions.backends.file"
 # SESSION_FILE_PATH = '/home/luizotavio/Desktop/temp'
 
-    #TODO: REMOVE
+#TODO: REMOVE
 INTERNAL_IPS = [
     # ...
     "127.0.0.1",
