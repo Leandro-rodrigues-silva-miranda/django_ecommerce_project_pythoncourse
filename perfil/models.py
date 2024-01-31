@@ -1,7 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.forms import ValidationError
+
+import re
 
 from utils.validator import valida_cpf,calc_age
+
 
 class Profile(models.Model):
     class Meta:
@@ -10,7 +14,7 @@ class Profile(models.Model):
 
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    age = models.PositiveIntegerField(null=True,blank=True,)
+    age = models.PositiveIntegerField(null=True,blank=True)
     birthday = models.DateField()  
     cpf = models.CharField(max_length=11,help_text='Somente números')
     address = models.CharField(max_length=50)
@@ -50,9 +54,25 @@ class Profile(models.Model):
             )
         )
     
-    def save(self, *args, **kwargs):
+    def clean(self):
         self.age=calc_age(self.birthday.year,self.birthday.month,self.birthday.day)
+
+        error_messages = {}
+
+        if not valida_cpf(self.cpf):
+            error_messages['cpf'] = 'Digite um CPF válido'
+
+        if re.search(r'[^0-9]',self.cep) or len(self.cep) != 8:
+            error_messages['cep'] = 'Digite um CEP válido'
+
+        if error_messages:
+            raise ValidationError(error_messages)
+
+
+    def save(self, *args, **kwargs):
+        
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.user.first_name} {self.user.last_name}'
+        return f'{self.user.first_name} {self.user.last_name}'\
+              if self.user.first_name else f'{self.user.username}'

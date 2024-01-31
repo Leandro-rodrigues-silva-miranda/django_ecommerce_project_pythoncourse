@@ -1,6 +1,12 @@
 from django.db import models
-from PIL import Image
 from django.conf import settings
+from django.utils.text import slugify
+
+
+from PIL import Image
+
+
+
 
 # Create your models here.
 class Product(models.Model):
@@ -12,20 +18,31 @@ class Product(models.Model):
     short_description = models.TextField(max_length=255)
     long_description = models.TextField()
     image = models.ImageField(upload_to='produto_imagens/%Y/%m',blank=True,null=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True,blank=True,null=True)
     mkt_price = models.FloatField(default=0)
     promotional_mkt_price = models.FloatField(null=True,blank=True)
     type = models.CharField(
         default='V',
         max_length=1,
         choices=(
-            ('V','Variacao'),
+            ('V','Variavel'),
             ('S','Simples')
             )
         )
     
+    def get_price(self):
+        return f'R$ {self.mkt_price:.2f}'.replace('.',',')
+    
+    def get_promo_price(self):
+        return f'R$ {self.promotional_mkt_price:.2f}'.replace('.',',')
+
     #Métodos sobrescritos
     def save(self, *args, **kwargs):
+        
+        if not self.slug:
+            slug = f'{slugify(self.name)}'
+            self.slug = slug
+
         super().save(*args, **kwargs)
 
         if self.image:
