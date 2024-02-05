@@ -34,7 +34,7 @@ class Product(models.Model):
         return f'R$ {self.mkt_price:.2f}'.replace('.',',')
     
     def get_promo_price(self):
-        return f'R$ {self.promotional_mkt_price:.2f}'.replace('.',',')
+        return f'R$ {self.promotional_mkt_price:.2f}'.replace('.',',') if self.promotional_mkt_price else ''
 
     #Métodos sobrescritos
     def save(self, *args, **kwargs):
@@ -76,6 +76,14 @@ class Variation(models.Model):
     price = models.FloatField()
     promotional_price = models.FloatField(null=True,blank=True)
     stock = models.PositiveIntegerField(default=1)
+
+    def get_price(self):
+        return f'R$ {self.price:.2f}'.replace('.',',')
+    
+    def get_promo_price(self):
+        return f'R$ {self.promotional_price:.2f}'.replace('.',',') if self.promotional_price else ''
+
+
 
     def __str__(self) -> str:
         return self.name or self.product.name
